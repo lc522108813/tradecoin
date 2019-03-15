@@ -1,5 +1,5 @@
 # tradecoin
-##A Spring-boot demo
+## A Spring-boot demo
 
 
  - query ticker from huobi api
