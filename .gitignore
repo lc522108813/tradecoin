@@ -10,11 +10,15 @@
 .springBeans
 .sts4-cache
 
+log
+.gitignore
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
+*.mvn
 
 ### NetBeans ###
 /nbproject/private/
@@ -23,3 +27,4 @@
 /nbdist/
 /.nb-gradle/
 /build/
+
