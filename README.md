@@ -1,11 +1,14 @@
 # tradecoin
-A Spring-boot demo
+##A Spring-boot demo
 
 
-1  query ticker from huobi api
+ - query ticker from huobi api
 
-2  trade robot
+- trade robot
 
 
-Q&A please contact  leichuang001@gmail.com
+
+
+
+> Q&A please contact  leichuang001@gmail.com
 
