@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns="http://ch.qos.logback/xml/ns/logback"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://ch.qos.logback/xml/ns/logback http://ch.qos.logback/xml/ns/logback/logback.xsd">
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+
+    <springProperty scope="context" name="logback.file" source="logback.file" defaultValue="log"/>
+
+    <property name="FILE_LOG_PATTERN" value="[%d{MM-dd HH:mm:ss:SSS} %p %F:%L]%X{PROCID}-->%m%n"/>
+
+    <property name="LOG_PATH" value="${logback.file}"/>
+
+    <property name="LOG_INFO_FILE" value="${LOG_PATH}/loginfo.log"/>
+    <property name="LOG_ERROR_FILE" value="${LOG_PATH}/logerr.log"/>
+
+    <property name="LOG_INFO_GZ_FILE" value="${LOG_PATH}/loginfo.%d{yyyy-MM-dd}-%i.log.gz"/>
+    <property name="LOG_ERROR_GZ_FILE" value="${LOG_PATH}/logerr.%d{yyyy-MM-dd}.log.gz"/>
+
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+
+    <!--info级别日志 多环境切换-->
+    <springProfile name="!prod">
+        <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_INFO_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_INFO_GZ_FILE}</fileNamePattern>
+                <maxHistory>15</maxHistory>
+                <maxFileSize>5120MB</maxFileSize>
+                <totalSizeCap>40GB</totalSizeCap>
+            </rollingPolicy>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+            </filter>
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+    </springProfile>
+    <springProfile name="prod">
+        <!-- prod添加ImmediateFlush，日志批量写入磁盘，提高性能 -->
+        <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_INFO_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_INFO_GZ_FILE}</fileNamePattern>
+                <maxHistory>15</maxHistory>
+                <maxFileSize>5120MB</maxFileSize>
+                <totalSizeCap>30GB</totalSizeCap>
+            </rollingPolicy>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+            </filter>
+            <encoder>
+                <ImmediateFlush>false</ImmediateFlush>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+
+    </springProfile>
+
+
+    <!--error级别日志定义-->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_ERROR_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_ERROR_GZ_FILE}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="ASYNC_INFO_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="INFO_FILE"/>
+        <queueSize>1024</queueSize>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+    <appender name="ASYNC_ERROR_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ERROR_FILE"/>
+        <queueSize>1024</queueSize>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+
+
+
+    <!--多环境切换配置-->
+    <springProfile name="dev">
+        <root level="info">
+            <appender-ref ref="ASYNC_INFO_FILE"/>
+            <appender-ref ref="ASYNC_ERROR_FILE"/>
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+    <springProfile name="test,pre,prod">
+        <root level="info">
+            <appender-ref ref="ASYNC_INFO_FILE"/>
+            <appender-ref ref="ASYNC_ERROR_FILE"/>
+        </root>
+    </springProfile>
+</configuration>
