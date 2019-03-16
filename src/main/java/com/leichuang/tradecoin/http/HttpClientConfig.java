@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 public class HttpClientConfig {
 
     /** 最大连接数 **/
-    public static final int maxTotal=100;
+    public static final int maxTotal=400;
 
-    /** 并发数20 **/
-    public static final int defaultMaxPerRoute=20;
+    /** 当前主机到目的主机的一个路由，主要作用在通过httpClient转发请求到不同的目的主机的连接数限制 **/
+    public static final int defaultMaxPerRoute=200;
 
     /** 创建连接的最长连接时间 **/
     public static final int connectTimeout=1000;

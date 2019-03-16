@@ -99,7 +99,7 @@
 
     <!--多环境切换配置-->
     <springProfile name="dev">
-        <root level="info">
+        <root level="error">
             <appender-ref ref="ASYNC_INFO_FILE"/>
             <appender-ref ref="ASYNC_ERROR_FILE"/>
             <appender-ref ref="STDOUT"/>
