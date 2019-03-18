@@ -31,6 +31,7 @@ public class CoinConsts {
     public static final String HUOBI_PERIOD_HALF_HOUR = "30min";
 
     public static final Integer LIMIT_1 = 1;
+    public static final Integer LIMIT_20 = 20;
     public static final String USDT_SYMBOL = "usdt";
 
 

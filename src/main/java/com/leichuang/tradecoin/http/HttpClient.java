@@ -68,14 +68,16 @@ public class HttpClient {
         httpGet.setConfig(config);
         httpGet.addHeader(HttpHeaders.CONTENT_TYPE,ContentType.APPLICATION_JSON.getMimeType());
         httpGet.addHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36");
-        CloseableHttpResponse response=this.closeableHttpClient.execute(httpGet);
-
-        int statusCode=response.getStatusLine().getStatusCode();
-        if(HttpStatus.SC_OK!=statusCode){
-            log.error(response.getStatusLine().getReasonPhrase());
-            throw new Exception("rest api call failed , the code is "+statusCode);
-        }
-
+        CloseableHttpResponse response;
+        int statusCode=HttpStatus.SC_OK;
+        do {
+            // 非首次尝试，间隔150ms
+            if(statusCode!=HttpStatus.SC_OK){
+                Thread.sleep(150);
+            }
+            response = this.closeableHttpClient.execute(httpGet);
+            statusCode=response.getStatusLine().getStatusCode();
+        } while (HttpStatus.SC_OK!=statusCode);
         return EntityUtils.toString(response.getEntity(),DEFAULT_CHARSET);
     }
 

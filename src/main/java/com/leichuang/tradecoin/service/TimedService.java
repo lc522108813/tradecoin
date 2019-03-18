@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 
 import static com.leichuang.tradecoin.consts.CoinConsts.LIMIT_1;
 
@@ -34,7 +35,6 @@ public class TimedService {
             if (coinEnum.getMarket().equals(CoinConsts.HUOBI)) {
                 String result = marketService.getHuobiKline(CoinConsts.HUOBI_PERIOD_ONE_MINUTE, LIMIT_1, coinEnum.getSymbol() + CoinConsts.USDT_SYMBOL);
                 MarketBO marketBO = ModelTransfer.transMarketBO(result);
-                Thread.sleep(150);
                 // 半小时内交易额
                 String dealResult = marketService.getHuobiKline(CoinConsts.HUOBI_PERIOD_HALF_HOUR, LIMIT_1, coinEnum.getSymbol() + CoinConsts.USDT_SYMBOL);
                 MarketBO marketDealResult = ModelTransfer.transMarketBO(dealResult);
@@ -48,12 +48,14 @@ public class TimedService {
                 else{
                     gains = marketBO.getClose().subtract(open).divide(open, 5).multiply(CoinConsts.BIG_DEC_100);
                 }
-                stringBuffer.append(PrintUtil.printHuobiMarketResult(marketBO, volume, coinEnum.getDesc(), gains)).append("\n");
+                // 计算ma10
+                HashMap<String,BigDecimal> map=tickerCache.getMA10(coinEnum.getSymbol());
+                BigDecimal ma10=map.get(String.valueOf(0)).multiply(new BigDecimal(9)).add(marketBO.getClose()).divide(new BigDecimal(10),4);
+                stringBuffer.append(PrintUtil.printMarketResult(marketBO.getClose(), volume, coinEnum.getDesc(), gains,ma10)).append("\n");
             }
             else if (coinEnum.getMarket().equals(CoinConsts.BINANCE)) {
                 String binanceResult = marketService.getBinanceKline((coinEnum.getSymbol() + com.leichuang.tradecoin.consts.CoinConsts.USDT_SYMBOL).toUpperCase(), CoinConsts.BINANCE_INTERVAL_ONE_MINUETE, null, null, LIMIT_1);
                 BinanceMarketKlineResult binanceMarketKlineResult = ModelTransfer.transBinanceMarketKlineResult(binanceResult);
-                Thread.sleep(150);
                 // 半小时内交易额
                 String dealResult = marketService.getBinanceKline((coinEnum.getSymbol() + CoinConsts.USDT_SYMBOL).toUpperCase(), CoinConsts.BINANCE_INTERVAL_THIRTY_MINUTE, null, null, LIMIT_1);
                 BinanceMarketKlineResult dealKlineResult = ModelTransfer.transBinanceMarketKlineResult(dealResult);
@@ -67,12 +69,20 @@ public class TimedService {
                 else{
                     gains = binanceMarketKlineResult.getClose().subtract(open).divide(open, 5).multiply(CoinConsts.BIG_DEC_100);
                 }
-                stringBuffer.append(PrintUtil.printBinanceMarketKlineResult(binanceMarketKlineResult, volume, coinEnum.getSymbol(), gains)).append("\n");
+                // 计算ma10
+                HashMap<String,BigDecimal> map=tickerCache.getMA10(coinEnum.getSymbol());
+                BigDecimal ma10=map.get(String.valueOf(0)).multiply(new BigDecimal(9)).add(binanceMarketKlineResult.getClose()).divide(new BigDecimal(10),4);
+                stringBuffer.append(PrintUtil.printMarketResult(binanceMarketKlineResult.getClose(), volume, coinEnum.getSymbol(), gains,ma10)).append("\n");
             }
-            /** 不同币种查询的调用间隔0.005秒 **/
-            Thread.sleep(150);
         }
         System.out.println(stringBuffer.toString());
+    }
+
+    @Scheduled(fixedRate = 3600_0000)
+    public void calculateTradingStrategy(){
+        //计算十日移动平均线
+
+
     }
 
 }

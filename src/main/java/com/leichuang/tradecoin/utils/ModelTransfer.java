@@ -8,6 +8,8 @@ import com.leichuang.tradecoin.entity.bo.MarketBO;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ModelTransfer {
 
@@ -35,4 +37,28 @@ public class ModelTransfer {
         return marketBO;
     }
 
-}
+    public static List<MarketBO> transListMarketBO(String jsonStr) {
+        List<MarketBO> result = new ArrayList<>();
+        HuobiMarketResult huobiMarketResult = JSONObject.parseObject(jsonStr, HuobiMarketResult.class);
+        if (huobiMarketResult != null && huobiMarketResult.getData() != null && huobiMarketResult.getData().size() != 0) {
+            result = huobiMarketResult.getData();
+        }
+        return result;
+    }
+
+    public static List<MarketBO> transListMarketBOFromBiance(String jsonStr) {
+        List<MarketBO> result=new ArrayList<>();
+        JSONArray coinArray = JSONArray.parseArray(jsonStr);
+        for(int i=0;i<coinArray.size();i++){
+            MarketBO marketBO=new MarketBO();
+            JSONArray coin = JSONArray.parseArray(coinArray.get(i).toString());
+            marketBO.setOpen(new BigDecimal((String) coin.get(1)));
+            marketBO.setHigh(new BigDecimal((String) coin.get(2)));
+            marketBO.setLow(new BigDecimal((String) coin.get(3)));
+            marketBO.setClose(new BigDecimal((String) coin.get(4)));
+            marketBO.setVol(new BigDecimal((String) coin.get(5)));
+            result.add(marketBO);
+        }
+        return result;
+    }
+    }
