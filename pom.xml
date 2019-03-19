@@ -8,7 +8,7 @@
         <version>2.1.2.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.leichuang</groupId>
+    <groupId>com.coins</groupId>
     <artifactId>tradecoin</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>tradecoin</name>
