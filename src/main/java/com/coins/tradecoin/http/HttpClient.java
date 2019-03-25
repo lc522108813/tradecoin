@@ -57,7 +57,7 @@ public class HttpClient {
             }
         }
         /** 打印get请求 **/
-//        log.info("doing get request \n"+uriBuilder.build().toString());
+        log.info("doing get request \n"+uriBuilder.build().toString());
         return this.doGet(uriBuilder.build().toString());
     }
 

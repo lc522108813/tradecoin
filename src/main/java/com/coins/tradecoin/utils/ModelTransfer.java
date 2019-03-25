@@ -15,6 +15,9 @@ import java.util.List;
 @Slf4j
 public class ModelTransfer {
 
+    // 返回的数组中又200条记录，只处理其中前30条记录
+    private static final Integer OK_KLINE_PROCESS_MAX_SIZE=30;
+
     static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static BinanceMarketKlineResult transBinanceMarketKlineResult(String jsonStr) {
@@ -36,7 +39,7 @@ public class ModelTransfer {
         try {
             huobiMarketResult = JSONObject.parseObject(jsonStr, HuobiMarketResult.class);
         } catch (Exception e) {
-            log.info("错误json转换发生: {}",jsonStr);
+            log.info("错误json转换发生: {}", jsonStr);
             e.printStackTrace();
         }
         if (huobiMarketResult != null && huobiMarketResult.getData() != null && huobiMarketResult.getData().size() != 0) {
@@ -51,7 +54,7 @@ public class ModelTransfer {
         try {
             huobiMarketResult = JSONObject.parseObject(jsonStr, HuobiMarketResult.class);
         } catch (Exception e) {
-            log.info("错误json转换发生: {}",jsonStr);
+            log.info("错误json转换发生: {}", jsonStr);
             e.printStackTrace();
         }
         if (huobiMarketResult != null && huobiMarketResult.getData() != null && huobiMarketResult.getData().size() != 0) {
@@ -75,4 +78,42 @@ public class ModelTransfer {
         }
         return result;
     }
+
+    public static MarketBO transOKTicker(String jsonStr) {
+        MarketBO marketBO = new MarketBO();
+        JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+        BigDecimal close = new BigDecimal((String) jsonObject.get("last"));
+        BigDecimal open = new BigDecimal((String) jsonObject.get("open_24h"));
+        marketBO.setClose(close);
+        marketBO.setVol(new BigDecimal((String) jsonObject.get("base_volume_24h")));
+        BigDecimal gains = close.subtract(close).divide(open).multiply(new BigDecimal(100));
+        marketBO.setGains(gains);
+        return marketBO;
+
+    }
+
+    public static List<MarketBO> transOKKline(String jsonStr) {
+        List<MarketBO> result = new ArrayList<>();
+        JSONArray coinArray = JSONArray.parseArray(jsonStr);
+        log.info("trans OKKline时的入参 {}",jsonStr);
+        for (int i = 0; i < OK_KLINE_PROCESS_MAX_SIZE; i++) {
+            MarketBO marketBO = new MarketBO();
+            JSONArray jsonArray = coinArray.getJSONArray(i);
+            log.info("循环内部jsonArray，每个元素 {}",jsonArray.toJSONString());
+            String time = jsonArray.get(0).toString();
+            String open = jsonArray.get(1).toString();
+            String high = jsonArray.get(2).toString();
+            String low = jsonArray.get(3).toString();
+            String close = jsonArray.get(4).toString();
+            String volume = jsonArray.get(5).toString();
+            marketBO.setOpen(new BigDecimal(open));
+            marketBO.setClose(new BigDecimal(close));
+            marketBO.setVol(new BigDecimal(volume));
+            result.add(marketBO);
+        }
+        return result;
+
+    }
+
+
 }

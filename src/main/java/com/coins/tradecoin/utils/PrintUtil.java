@@ -11,6 +11,8 @@ public class PrintUtil {
     private final static BigDecimal bigNumber = new BigDecimal(1000);
 
 
+    /** 打印内容
+     * 1 当前close价格 2 30分钟内交易量 3 当日涨跌幅 4 ma10数据 **/
     public static String printMarketResult(BigDecimal close, BigDecimal volume, String coin, BigDecimal gains, BigDecimal ma10) {
         PrintMarketTickerBO bo = PrintMarketTickerBO.builder()
                 .close(close)

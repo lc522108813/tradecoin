@@ -2,6 +2,7 @@ package com.coins.tradecoin.dao;
 
 import com.coins.tradecoin.entity.SettingPO;
 import com.coins.tradecoin.entity.SettingPOExample;
+
 import java.util.List;
 
 public interface SettingMapper {

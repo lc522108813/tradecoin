@@ -2,6 +2,7 @@ package com.coins.tradecoin.dao;
 
 import com.coins.tradecoin.entity.UserPO;
 import com.coins.tradecoin.entity.UserPOExample;
+
 import java.util.List;
 
 public interface UserMapper {

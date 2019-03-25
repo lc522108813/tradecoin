@@ -29,6 +29,8 @@ public class MarketBO implements Serializable {
     private BigDecimal vol;
     /** 成交笔数 **/
     private Integer count;
+    /** 单日涨幅 **/
+    private BigDecimal gains;
 
     public MarketBO(){
         this.open=new BigDecimal(0);

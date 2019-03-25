@@ -4,11 +4,17 @@ public class UriConsts {
 
     public static final String HUOBI_PRO_PREFIX ="https://api.huobipro.com";
 
+    public static final String OKEX_PREFIX="https://www.okex.com/";
+
     public static final String HUOBI_FUTURE_TICKER = "/market/detail/merged";
     public static final String HUOBI_FUTURE_DEPTH = "/market/depth";
     public static final String HUOBI_FUTURE_KLINE = "/market/history/kline";
     public static final String HUOBI_FUTURE_TRADE = "/market/history/trade";
     public static final String HOUBI_FUTURE_TICKER="/market/tickers";
+
+    public static final String OKEX_TIKER="/api/spot/v3/instruments/%s/ticker";
+
+    public static final String OKEX_KLINE="/api/spot/v3/instruments/%s/candles";
 
     // 获取合约信息 /v1/contract_contract_info
     public static final String HUOBI_FUTURE_CONTRACT_INFO = "/api/v1/contract_contract_info";

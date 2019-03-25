@@ -10,6 +10,8 @@ public class CoinConsts {
 
     public static final String HUOBI = "huobi";
 
+    public static final String OKEX = "okex";
+
     public static final String BINANCE_INTERVAL_ONE_MINUETE = "1m";
 
     public static final String BINANCE_INTERVAL_THREE_MINUETE = "3m";
@@ -29,6 +31,11 @@ public class CoinConsts {
     public static final String HUOBI_PERIOD_ONE_DAY = "1day";
     public static final String HUOBI_PERIOD_ONE_MINUTE = "1min";
     public static final String HUOBI_PERIOD_HALF_HOUR = "30min";
+
+    public static final Integer OKEX_PERIOD_ONE_MINUTE=60;
+
+    public static final Integer OKEX_PERIOD_HALF_HOUR=1800;
+    public static final Integer OKEX_PERIOD_ONE_DAY=86400;
 
     public static final Integer LIMIT_1 = 1;
     public static final Integer LIMIT_20 = 20;

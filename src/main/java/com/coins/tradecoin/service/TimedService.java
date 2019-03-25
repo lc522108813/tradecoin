@@ -50,8 +50,7 @@ public class TimedService {
                     gains = marketBO.getClose().subtract(open).divide(open, 5).multiply(CoinConsts.BIG_DEC_100);
                 }
                 // 计算ma10
-                HashMap<String,BigDecimal> map=tickerCache.getMA10(coinEnum.getSymbol());
-                BigDecimal ma10=map.get(String.valueOf(0)).multiply(new BigDecimal(9)).add(marketBO.getClose()).divide(new BigDecimal(10),4);
+                BigDecimal ma10=calculateMA10(coinEnum,marketBO.getClose());
                 stringBuffer.append(PrintUtil.printMarketResult(marketBO.getClose(), volume, coinEnum.getDesc(), gains,ma10)).append("\n");
             }
             else if (coinEnum.getMarket().equals(CoinConsts.BINANCE)) {
@@ -71,12 +70,40 @@ public class TimedService {
                     gains = binanceMarketKlineResult.getClose().subtract(open).divide(open, 5).multiply(CoinConsts.BIG_DEC_100);
                 }
                 // 计算ma10
-                HashMap<String,BigDecimal> map=tickerCache.getMA10(coinEnum.getSymbol());
-                BigDecimal ma10=map.get(String.valueOf(0)).multiply(new BigDecimal(9)).add(binanceMarketKlineResult.getClose()).divide(new BigDecimal(10),4);
+                BigDecimal ma10=calculateMA10(coinEnum,binanceMarketKlineResult.getClose());
                 stringBuffer.append(PrintUtil.printMarketResult(binanceMarketKlineResult.getClose(), volume, coinEnum.getSymbol(), gains,ma10)).append("\n");
+            }
+            else if(coinEnum.getMarket().equals(CoinConsts.OKEX)){
+                // 当前价格
+                String okReulstStr = marketService.getOkexKline(coinEnum.getSymbol(),CoinConsts.USDT_SYMBOL,CoinConsts.OKEX_PERIOD_ONE_MINUTE);
+                List<MarketBO> list=ModelTransfer.transOKKline(okReulstStr);
+                MarketBO marketBO=list.get(0);
+                // 30分钟交易量
+                String halfResultStr = marketService.getOkexKline(coinEnum.getSymbol(),CoinConsts.USDT_SYMBOL,CoinConsts.OKEX_PERIOD_HALF_HOUR);
+                List<MarketBO> list2=ModelTransfer.transOKKline(halfResultStr);
+                MarketBO halfBO=list2.get(0);
+                // 当日涨跌幅
+                BigDecimal open = tickerCache.getOpen(CoinConsts.OKEX + ":" + coinEnum.getSymbol());
+                BigDecimal gains;
+                if (marketBO.getClose().compareTo(new BigDecimal(0)) == 0) {
+                    gains = new BigDecimal(0);
+                }
+                else{
+                    gains = marketBO.getClose().subtract(open).divide(open, 5).multiply(CoinConsts.BIG_DEC_100);
+                }
+                // 计算ma10
+                BigDecimal ma10=calculateMA10(coinEnum,marketBO.getClose());
+                stringBuffer.append(PrintUtil.printMarketResult(marketBO.getClose(), halfBO.getVol(), coinEnum.getSymbol(), gains,ma10)).append("\n");
+
             }
         }
         System.out.println(stringBuffer.toString());
+    }
+
+    public BigDecimal calculateMA10(CoinEnum coinEnum,BigDecimal close){
+        HashMap<String,BigDecimal> map=tickerCache.getMA10(coinEnum.getSymbol());
+        BigDecimal ma10=map.get(String.valueOf(0)).multiply(new BigDecimal(9)).add(close).divide(new BigDecimal(10),4);
+        return ma10;
     }
 
     @Scheduled(fixedRate = 3600_0000)

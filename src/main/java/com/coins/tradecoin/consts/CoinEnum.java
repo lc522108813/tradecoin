@@ -11,7 +11,9 @@ import lombok.Getter;
 public enum CoinEnum {
 
     BNB("bnb", "bnb", "binance"),
+    OKB("okb","okb","okex"),
     HT("ht", "ht ", "huobi"),
+    ONT("ont", "ont", "huobi"),
     BTC("btc", "btc", "huobi"),
     BSV("bsv", "bsv", "huobi"),
     BCH("bch", "bch", "huobi"),

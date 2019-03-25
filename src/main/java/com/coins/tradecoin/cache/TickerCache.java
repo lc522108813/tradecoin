@@ -1,13 +1,13 @@
 package com.coins.tradecoin.cache;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.coins.tradecoin.consts.CoinConsts;
 import com.coins.tradecoin.consts.CoinEnum;
 import com.coins.tradecoin.entity.bo.BinanceMarketKlineResult;
 import com.coins.tradecoin.entity.bo.MarketBO;
 import com.coins.tradecoin.service.MarketService;
 import com.coins.tradecoin.utils.ModelTransfer;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ public class TickerCache {
     @Autowired
     private MarketService marketService;
 
-    // 本地缓存，今日开盘价，key的格式 huobi:ht  binance:btc
+    // 本地缓存，今日开盘价，key的格式 huobi:ht  binance:btc okex:okb
     private final LoadingCache<String, BigDecimal> OPEN_PRICE_CACHE = Caffeine.newBuilder()
             .refreshAfterWrite(15, TimeUnit.MINUTES)
             .expireAfterWrite(20, TimeUnit.MINUTES)
@@ -48,6 +48,12 @@ public class TickerCache {
             String tickerResultStr = marketService.getBinanceKline((coinEnum.getSymbol() + CoinConsts.USDT_SYMBOL).toUpperCase(), CoinConsts.BINANCE_INTERVAL_ONE_DAY, null, null, CoinConsts.LIMIT_1);
             BinanceMarketKlineResult tickerResult = ModelTransfer.transBinanceMarketKlineResult(tickerResultStr);
             return tickerResult.getOpen();
+        }
+        else if(exchange.contains(CoinConsts.OKEX)){
+            String kLineResult = marketService.getOkexKline(coinEnum.getSymbol(), CoinConsts.USDT_SYMBOL, CoinConsts.OKEX_PERIOD_ONE_DAY);
+            List<MarketBO> list=ModelTransfer.transOKKline(kLineResult);
+            MarketBO marketBO = list.get(0);
+            return marketBO.getOpen();
         }
         return null;
     }
@@ -77,6 +83,10 @@ public class TickerCache {
         else if (coinEnum.getMarket().contains(CoinConsts.BINANCE)) {
             String resultStr = marketService.getBinanceKline((coinEnum.getSymbol() + CoinConsts.USDT_SYMBOL).toUpperCase(), CoinConsts.BINANCE_INTERVAL_ONE_DAY, null, null, CoinConsts.LIMIT_20);
             result = ModelTransfer.transListMarketBOFromBinance(resultStr);
+        }
+        else if(coinEnum.getMarket().contains(CoinConsts.OKEX)){
+            String kLineResult = marketService.getOkexKline(coinEnum.getSymbol(), CoinConsts.USDT_SYMBOL, CoinConsts.OKEX_PERIOD_ONE_DAY);
+            result = ModelTransfer.transOKKline(kLineResult);
         }
         for (Integer backDays : BACK_DAYS) {
             int total = (backDays == 0 ? 9 : 10);

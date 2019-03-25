@@ -66,4 +66,30 @@ public class MarketService {
         return null;
     }
 
+    @RetryDot(count=3)
+    public String getOkexTicker(String symbol,String currency){
+        String instrument=symbol+"-"+currency;
+        try {
+            return httpClient.doGet(UriConsts.OKEX_PREFIX + String.format(UriConsts.OKEX_TIKER,instrument.toUpperCase()));
+        } catch (Exception e) {
+            log.error("call http OKEX_TIKER failed");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @RetryDot(count=3)
+    public String getOkexKline(String symbol,String currency,Integer granularity){
+        String instrument=symbol+"-"+currency;
+        TreeMap<String, Object> params = new TreeMap<>();
+        params.put("granularity", granularity);
+        try {
+            return httpClient.doGet(UriConsts.OKEX_PREFIX + String.format(UriConsts.OKEX_KLINE,instrument.toUpperCase()),params);
+        } catch (Exception e) {
+            log.error("call http OKEX_KLINE failed");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
